@@ -10,6 +10,18 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Pin colors */
+  --color-red: #EF4444;
+  --color-orange: #F97316;
+  --color-yellow: #EAB308;
+  --color-green: #22C55E;
+  --color-teal: #14B8A6;
+  --color-blue: #3B82F6;
+  --color-indigo: #6366F1;
+  --color-purple: #A855F7;
+  --color-pink: #EC4899;
+  --color-gray: #6B7280;
 }
 
 @media (prefers-color-scheme: dark) {
