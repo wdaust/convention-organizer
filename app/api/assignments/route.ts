@@ -36,7 +36,7 @@ export async function GET(request: Request) {
         }
 
         if (filters.length > 0) {
-            query.filter = {
+            query.filter = filters.length === 1 ? filters[0] : {
                 and: filters,
             };
         }
