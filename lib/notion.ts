@@ -1,6 +1,6 @@
 import { Client } from '@notionhq/client';
 
-const token = process.env.NOTION_TOKEN;
+const token = process.env.NOTION_KEY || process.env.NOTION_TOKEN;
 const dbId = process.env.NOTION_DATABASE_ID;
 
 export const notion = new Client({ auth: token });
