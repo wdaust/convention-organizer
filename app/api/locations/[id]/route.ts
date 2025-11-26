@@ -3,9 +3,10 @@ import { notion } from '@/lib/notion';
 
 export async function PATCH(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const { name, color, level, category } = await request.json();
 
         const properties: any = {};
@@ -27,7 +28,7 @@ export async function PATCH(
         }
 
         await notion.pages.update({
-            page_id: params.id,
+            page_id: id,
             properties,
         });
 
@@ -40,12 +41,13 @@ export async function PATCH(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         // Notion doesn't actually delete pages, it archives them
         await notion.pages.update({
-            page_id: params.id,
+            page_id: id,
             archived: true,
         });
 
