@@ -7,6 +7,10 @@ export async function GET(request: Request) {
     }
 
     try {
+        // DEBUG: Fetch database schema to see actual property names
+        const dbSchema = await notion.databases.retrieve({ database_id: assignmentsDatabaseId });
+        console.log('Assignments DB Properties:', Object.keys(dbSchema.properties));
+
         const { searchParams } = new URL(request.url);
         const departmentId = searchParams.get('departmentId');
         const personId = searchParams.get('personId');
