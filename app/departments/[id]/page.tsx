@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-export default function DepartmentOverviewPage({ params }: { params: { id: string } }) {
+export default function DepartmentOverviewPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
+    const { id } = use(params);
     const [department, setDepartment] = useState<any>(null);
 
     useEffect(() => {
@@ -13,7 +14,7 @@ export default function DepartmentOverviewPage({ params }: { params: { id: strin
             try {
                 const res = await fetch('/api/departments');
                 const data = await res.json();
-                const dept = data.find((d: any) => d.id === params.id);
+                const dept = data.find((d: any) => d.id === id);
                 setDepartment(dept);
             } catch (error) {
                 console.error('Failed to fetch department', error);
@@ -21,18 +22,18 @@ export default function DepartmentOverviewPage({ params }: { params: { id: strin
         }
 
         fetchDepartment();
-    }, [params.id]);
+    }, [id]);
 
     const menuItems = [
-        { label: 'Department Settings', href: `/departments/${params.id}/settings` },
-        { label: 'Department Docs', href: `/departments/${params.id}/docs` },
-        { label: 'Department Messaging', href: `/departments/${params.id}/messaging` },
-        { label: 'Department Inventory', href: `/departments/${params.id}/inventory` },
-        { label: 'Department Check-In', href: `/departments/${params.id}/check-in` },
-        { label: 'Department Oversight', href: `/departments/${params.id}/oversight` },
-        { label: 'Department Reports', href: `/departments/${params.id}/reports` },
-        { label: 'Meetings', href: `/departments/${params.id}/meetings` },
-        { label: 'Congregation List', href: `/departments/${params.id}/congregation` },
+        { label: 'Department Settings', href: `/departments/${id}/settings` },
+        { label: 'Department Docs', href: `/departments/${id}/docs` },
+        { label: 'Department Messaging', href: `/departments/${id}/messaging` },
+        { label: 'Department Inventory', href: `/departments/${id}/inventory` },
+        { label: 'Department Check-In', href: `/departments/${id}/check-in` },
+        { label: 'Department Oversight', href: `/departments/${id}/oversight` },
+        { label: 'Department Reports', href: `/departments/${id}/reports` },
+        { label: 'Meetings', href: `/departments/${id}/meetings` },
+        { label: 'Congregation List', href: `/departments/${id}/congregation` },
     ];
 
     return (

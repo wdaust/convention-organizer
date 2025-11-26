@@ -1,14 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 import HierarchyView from '@/components/HierarchyView';
 import AddPersonModal from '@/components/AddPersonModal';
 
-export default function OversightPage() {
-  const params = useParams();
-  const departmentId = params.id as string;
+export default function OversightPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: departmentId } = use(params);
 
   const [departmentName, setDepartmentName] = useState('');
   const [departmentNotionId, setDepartmentNotionId] = useState('');
@@ -95,6 +93,16 @@ export default function OversightPage() {
 
   const hierarchyData = buildTree(null);
 
+  // Create a map of people for easy lookup
+  const peopleMap = people.reduce((map, person) => {
+    map[person.id] = person;
+    return map;
+  }, {} as Record<string, any>);
+
+  const handleAddSubordinate = (parentId: string, role: string) => {
+    openAddModal(role, parentId);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -133,10 +141,14 @@ export default function OversightPage() {
             {/* Hierarchy Display */}
             {hierarchyData.length > 0 && (
               <div className="space-y-4">
-                <HierarchyView
-                  nodes={hierarchyData}
-                  onAddChild={openAddModal}
-                />
+                {hierarchyData.map(assignment => (
+                  <HierarchyView
+                    key={assignment.id}
+                    assignment={assignment}
+                    peopleMap={peopleMap}
+                    onAddSubordinate={handleAddSubordinate}
+                  />
+                ))}
               </div>
             )}
           </>
