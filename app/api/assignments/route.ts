@@ -99,6 +99,8 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { personId, departmentId, role, reportsTo } = body;
 
+        console.log('Creating assignment with:', { personId, departmentId, role, reportsTo });
+
         const properties: any = {
             Person: {
                 relation: [
@@ -132,6 +134,8 @@ export async function POST(request: Request) {
             };
         }
 
+        console.log('Notion properties:', JSON.stringify(properties, null, 2));
+
         const response = await notion.pages.create({
             parent: { database_id: assignmentsDatabaseId },
             properties: properties,
@@ -140,6 +144,16 @@ export async function POST(request: Request) {
         return NextResponse.json(response);
     } catch (error) {
         console.error('Error creating assignment:', error);
-        return NextResponse.json({ error: 'Failed to create assignment' }, { status: 500 });
+        console.error('Error details:', {
+            message: (error as any).message,
+            code: (error as any).code,
+            body: JSON.stringify((error as any).body, null, 2),
+        });
+        return NextResponse.json({
+            error: 'Failed to create assignment',
+            message: (error as any).message,
+            code: (error as any).code,
+            details: (error as any).body
+        }, { status: 500 });
     }
 }

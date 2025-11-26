@@ -30,9 +30,14 @@ export default function OversightPage({ params }: { params: Promise<{ id: string
       const deptRes = await fetch('/api/departments');
       const depts = await deptRes.json();
       const dept = depts.find((d: any) => d.id === departmentId);
+
       if (dept) {
+        console.log('Found department:', dept);
         setDepartmentName(dept.name);
         setDepartmentNotionId(dept.notionId);
+      } else {
+        console.error('Department not found for ID:', departmentId);
+        console.log('Available departments:', depts.map((d: any) => ({ id: d.id, name: d.name })));
       }
 
       // Fetch people
@@ -40,10 +45,15 @@ export default function OversightPage({ params }: { params: Promise<{ id: string
       const peopleData = await peopleRes.json();
       setPeople(peopleData);
 
-      // Fetch assignments for this department
-      const assignRes = await fetch(`/api/assignments?departmentId=${departmentId}`);
-      const assignData = await assignRes.json();
-      setAssignments(assignData);
+      // Fetch assignments for this department - use notionId if available
+      if (dept?.notionId) {
+        const assignRes = await fetch(`/api/assignments?departmentId=${dept.notionId}`);
+        const assignData = await assignRes.json();
+        setAssignments(assignData);
+      } else {
+        console.warn('Cannot fetch assignments without department Notion ID');
+        setAssignments([]);
+      }
     } catch (error) {
       console.error('Failed to fetch data', error);
     } finally {
@@ -53,21 +63,43 @@ export default function OversightPage({ params }: { params: Promise<{ id: string
 
   const handleAddPerson = async (person: any, role: string) => {
     try {
-      await fetch('/api/assignments', {
+      // Validate we have the Notion ID
+      if (!departmentNotionId) {
+        alert('Error: Department information not loaded. Please refresh the page.');
+        return;
+      }
+
+      console.log('Adding person:', {
+        personId: person.id,
+        departmentNotionId,
+        role,
+        reportsTo: modalParentId
+      });
+
+      const response = await fetch('/api/assignments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           personId: person.id,
-          departmentId: departmentNotionId || departmentId,
+          departmentId: departmentNotionId,
           role: role,
           reportsTo: modalParentId,
           tags: []
         })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server error:', errorData);
+        alert(`Failed to add ${role}: ${errorData.message || errorData.error}`);
+        return;
+      }
+
       setIsAddModalOpen(false);
       fetchData();
     } catch (error) {
       console.error('Failed to add person', error);
+      alert(`Failed to add ${role}. Please try again.`);
     }
   };
 
