@@ -193,6 +193,7 @@ export default function OversightPage({ params }: { params: Promise<{ id: string
         onClose={() => setIsAddModalOpen(false)}
         onAdd={handleAddPerson}
         title={`Add ${modalRole}`}
+        role={modalRole}
       />
 
       {/* Mobile Bottom Navigation */}
