@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 interface AddPersonModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onAdd: (person: any) => void;
+    onAdd: (person: any, role: string) => void;
     title?: string;
 }
 
